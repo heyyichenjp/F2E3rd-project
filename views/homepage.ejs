@@ -1,0 +1,90 @@
+
+<style>
+     .newest_data {
+            display: flex;
+        }
+
+        .card {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+
+        }
+
+        .cardpic {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cardtitle {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            color: #fff;
+        }
+</style>
+
+<body>
+    <div ng-app = 'app'>
+        <%- include header %>
+
+    <div  ng-controller='homeCtrl'>
+         <div class="my-5">
+            <div>
+                <h3>最新活動</h3>
+                <div class="d-flex flex-wrap mx-10">
+                    <div class="card  " ng-repeat='(key,item) in newest_data' style="margin: 2px 20px;">
+                  
+                        <img src="{{item.Picture.PictureUrl1}}" alt="" class='cardpic'>
+                        <span class="cardtitle">{{item.Name}}</span>
+
+                    </div>
+
+                </div>
+
+
+            </div>
+            <div>
+                <h3>熱門景點排行</h3>
+
+            </div>
+            <div>
+                <h3>旅遊影音</h3>
+
+            </div>
+
+        </div>
+    </div>
+
+    
+
+
+    <%-include footer %>
+
+    </div>
+    
+    <script>
+       
+         var app = angular.module('app',[])
+        app.controller('homeCtrl',function($scope,){
+            var urlNewest = 'https://ptx.transportdata.tw/MOTC/v2/Tourism/Activity?$filter=Picture%2FPictureUrl1%20ne%20null&$orderby=StartTime%20desc&$top=10&$format=JSON'
+            $http.get(urlNewest,
+                { Headers: getAuthorizationHeader() }
+            ).then(function success(Data) {
+
+                //alert('取得成功')
+                var data = JSON.stringify(Data.data);
+                $scope.newest_data = JSON.parse(data)
+                console.log($scope.newest_data);
+
+
+            })
+
+        })
+    </script>
+    
+</body>

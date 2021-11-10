@@ -1,0 +1,10 @@
+<form method="post" action="api/v1/add">
+    CODE_TYPE: <input type="text" name="code_type" value="<%=code.code_type %>" size="40"/> <BR/>
+    CODE_SEQ1: <input type="text" name="code_seq1" value="<%=code.code_seq1 %>"  size="40"/> <BR/>
+    CODE_SEQ2: <input type="text" name="code_seq2" value="<%=code.code_seq2 %>"  size="40"/> <BR/>
+    CODE_SEQ3: <input type="text" name="code_seq3" value="<%=code.code_seq3 %>"  size="40"/> <BR/>
+    CODE_DESC1: <input type="text" name="code_desc1" value="<%=code.code_desc1 %>"  size="40"/> <BR/>
+    CODE_DESC2: <input type="text" name="code_desc2" value="<%=code.code_desc2 %>"  size="40"/> <BR/>
+    <input type="hidden" name="guid" value="<%=code.guid %>"/>
+    <input type="submit" value="送出"/>
+</form>

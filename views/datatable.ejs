@@ -1,0 +1,566 @@
+<script src="/javascripts/ui-grid.js"></script>
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="/css/ui-grid.css" type="text/css">
+<style>
+    .lessdata .rowtitle {
+        display: none;
+    }
+
+    .rowtitle {
+        display: flex;
+    }
+
+    #bm_p_list {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(238, 233, 229, 0.5);
+    }
+
+    .inner_list {
+        margin: auto;
+        position: relative;
+        width: 450px;
+        background-color: rgba(248, 217, 215, 0.952);
+        border-radius: 10%;
+    }
+
+    .close_btn {
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #000;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    @media screen and (max-width: 767px) {
+        .lessdata .rowtitle {
+            display: block;
+            position: absolute;
+            left: 5px;
+            width: 5rem;
+        }
+
+        .lessdata .rowdata {
+            position: relative;
+            padding: 5px 5px 5px 5rem;
+        }
+
+        .rowtitle {
+            display: none;
+        }
+
+        .lessdata .rowdata:first-child {
+            background: #4578a6;
+            color: #fff;
+        }
+    }
+</style>
+
+<div class="wrapper" ng-app="myApp" ng-controller="Ctrl" id="search">
+    <div class="content">
+        <div class="cen_content">
+            <div class="tab_container">
+                <h3 class="pagetitle">
+                  
+                </h3>
+                <div>
+                    <div class="row">
+                        <div class="col-md-2 col-xl-1 sw text-left text-md-right">掛號號碼</div>
+                        <div class="col-md-6 col-xl-6 p-2">
+                            <div class="d-flex align-items-center">
+                                <input id="reg_yy" ng-model="search.reg_yy" class="current-input space7num" type="text"
+                                    maxlength="7" placeholder="7碼" ng-blur="paddingLeft_HTML('reg_yy', 7)">
+                                <span class="">-</span>
+                                <input id="reg_no" ng-model="search.reg_no" class="current-input spacedate" type="text"
+                                    maxlength="7" placeholder="7碼" ng-blur="paddingLeft_HTML('reg_no', 7)">
+                                <!-- <span class="">-</span> -->
+                                <input id="reg_cg" ng-model="search.reg_cg" class="current-input space3num"
+                                    type="hidden" maxlength="2" placeholder="2碼"
+                                    ng-blur="paddingLeft_HTML('reg_cg', 2)">
+                            </div>
+                            <span class="d-block d-md-inline-block">例：1080101-0001778</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 col-xl-1 sw text-left text-md-right">執照字號</div>
+                        <div class="col-md-10 col-xl-11 d-flex flex-wrap p-2">
+                            <div>
+                                <input id="license_yy" ng-model="search.license_yy" class="space7num" type="text"
+                                    maxlength="7" ng-blur="paddingLeft_HTML('license_yy', 7)">
+                                <span class="">-</span>
+                                <input id="license_kind" ng-model="search.license_kind" class="space7num" type="text"
+                                    placeholder="點擊選擇" ng-click="lov_click('BMS', 'license_kind')" readonly>
+                                <span class="sym">-</span>
+                                <input id="license_no1" ng-model="search.license_no1" class="space5num" type="text"
+                                    maxlength="5" ng-blur="paddingLeft_HTML('license_no1', 5)">
+                            </div>
+                            <!-- <div>
+                                <span class="">變更次數</span>
+                                <input id="license_no2" ng-model="search.license_no2" class="space3num" type="text"
+                                    maxlength="2" ng-blur="paddingLeft_HTML('license_no2', 2)">
+                            </div> -->
+                            <div>
+                                <span class="">字軌</span>
+                                <input id="license_word" name="license_word" ng-model="search.license_word"
+                                    class="space3num" type="text"
+                                    ng-click="lov_click_Where('WORD', 'license_word', 'license_desc')"
+                                    ng-keydown="lov_click_Where('WORD', 'license_word', 'license_desc')"
+                                    title="請先選擇執照類型">
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <span class="">(</span>
+                                <input id="license_desc" ng-model="search.license_desc" type="text" placeholder="輸入執照字號"
+                                    ng-change="comLicense_desc()" readonly>
+                                <span class="">)</span>
+                            </div>
+                            <div>
+                                <span class="">連照序號</span>
+                                <input id="license_seq" ng-model="search.license_seq" class="space3num" type="text"
+                                    maxlength="2" ng-blur="paddingLeft_HTML('license_seq', 2)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row Sbtn">
+                        <div class="col-md-3 rule my-2"></div>
+                        <div class="col-md-5 my-2 text-center">
+                            <button class="btn-bmsweb notedit" ng-click="search()">查詢</button>
+
+                        </div>
+                    </div>
+
+
+                    <!-- tab_content -->
+
+                    <div class="row dr Sbtn">
+                    </div>
+                </div> <!-- tab_container>div -->
+            </div> <!-- tab_container -->
+
+            <div id="bm_p_list">
+                <div class="inner_list">
+                    <div class="close_btn">X</div>
+                    <div class=" text-secondary  ">
+                        <div class=" text-center">監造人名單</div>
+                    </div>
+                    <div class=" text-center  border-bottom d-flex" ng-repeat="ele in grid_data2 ">
+                        <div class="col-2">
+                            <div class=" text-light bg-dark">序號</div>
+                            <a href="javascript:void(0);" ng-click="Edit2($index);">{{ele.person_seq}} </a>
+
+                        </div>
+                        <div class="col-10">
+                            <div class=" text-light bg-dark">監造人名稱</div>
+                            <span>{{ele.name}}</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!--多個監造人視窗 bm_p_list 結束 -->
+
+            <div style="margin: 5px 5px;">
+                <table id="datatable" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>編號</th>
+                            <th>監造人名稱</th>
+                            <th>掛號號碼</th>
+                            <th>執照號碼</th>
+                            <th>變更紀錄</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="modal" tabindex="-1" role="dialog" id="myModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">詳細資料</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body list-area border container-fluid">
+                            <div class="d-flex  border ">
+                                <span class="col-12 col-md-4 bg-secondary text-white p-1">執照號碼</span>
+                                <span class="col-12 col-md-8">{{data.license_desc}}</span>
+                            </div>
+                            <div class="d-flex border">
+                                <span class="col-12 col-md-2  bg-secondary text-white p-1">變更<br>次數</span>
+                                <span class="col-12 col-md-2  d-md-flex align-items-center">
+                                    <input ng-model="data.license_cg" class="space3num " type="text" placeholder=""
+                                        readonly>
+                                </span>
+                                <span class="col-12 col-md-2  bg-secondary text-white p-1">掛號<br>號碼</span>
+                                <span class="col-12 col-md-6  d-flex align-items-center">
+                                    <input id="reg_yy" ng-model="data.reg_yy"
+                                        class="current-input space7num bg-lightyellow" type="text" maxlength="7">
+                                    -
+                                    <input id="reg_no" ng-model="data.reg_no"
+                                        class="current-input space7num bg-lightyellow" type="text" maxlength="7">
+                                </span>
+                            </div>
+
+
+                            <div class="d-flex flex-wrap border">
+
+                                <span class="col-12 col-md-2 text-left  bg-secondary text-white p-1">姓名</span>
+                                <span class="col-12 col-md-4 d-block d-md-flex align-items-center">
+                                    <input id="name" ng-model="data.p03_name" class="current-input" type="text">
+                                </span>
+
+                                <span class="col-12 col-md-2 text-left  bg-secondary text-white p-1">身分證字號</span>
+                                <span class="col-12 col-md-4  d-md-flex align-items-center">
+                                    <input id="identify_no" ng-model="data.identify_no" class="current-input"
+                                        type="text" maxlength="10">
+                                </span>
+
+                            </div>
+                            <div class="d-flex flex-wrap border">
+                                <span class="col-12 col-md-4 text-left  bg-secondary text-white p-1">事務所名稱</span>
+                                <span class="col-12 col-md-8">
+                                    <input ng-model="data.office_name" class="current-input" type="text">
+                                </span>
+                            </div>
+
+                            <div class="d-flex flex-wrap border">
+                                <span class=" col-12 col-md-4 bg-secondary text-white p-1">事務所地址 </span>
+                                <span class="col-12 col-md-8">
+                                    <span class="d-flex my-1">
+                                        <input class="space7num addr code" type="text" ng-model="data.com_zip"
+                                            id="com_zip" readonly placeholder="點擊選擇">
+                                        <input class="current-input addr" type="text" ng-model="data.com_zip_desc"
+                                            id="com_zip_desc" readonly placeholder="依照選擇項目顯示">
+                                    </span>
+                                    <input ng-model="data.com_address" class="current-input" type="text">
+                                </span>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" ng-click='NewIN()'>新增</button>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </div>
+        <!-- ejs頁面範圍 到這裡結束 -->
+    </div>
+
+
+
+</div>
+
+<%-include ../../../baselayout/loadingDiv %>
+    <%-include ../../../baselayout/AngularLOV %>
+        </div> <!-- wrapper -->
+
+        <form id="editform" name="editform" action="/bmis/initBs36Edit" method="post" target="36Editpage">
+            <input type="hidden" id="editdata" name="editdata" value="" />
+            <input type='hidden' id="_csrf" name="_csrf" value="<%=csrftoken %>" />
+        </form>
+
+        <script>
+            $(document).ready(function () {
+                $('#bm_p_list').hide();
+                $('.close_btn').click(function () {
+                    $('#bm_p_list').hide();
+
+                })
+
+            })
+
+
+        </script>
+
+        <script>
+
+            var app = angular.module("myApp", ["ui.grid", "ui.grid.pagination"]);
+            app.controller("Ctrl", function ($scope, $http, $filter, $compile, uiGridConstants) {
+                $scope.search = {}
+                $scope.num_count = 5; //每頁筆數
+                $scope.num_s = 0; //起始筆數
+
+                $scope.current_page = 0; //目前頁數
+                $scope.pages = 0;
+                $scope.grid_data = [];
+
+
+
+
+                $scope.search = function () {
+                    loading_div_open()
+
+                    var qryData = {};
+
+                    for (var key in $scope.search) {
+                        if (key != 'license_desc') {
+                            qryData[key] = $scope.search[key]
+                        }
+                    }
+
+                    var url = "/bmis/initBs36Search";
+                    $http.post(url, qryData).then(function success(result) {
+
+                        loading_div_close()
+                        if (result.data.msg != undefined) {
+                            alert(result.data.msg)
+                        } else {
+                            if (result.data.data.length == 200) {
+                                alert(
+                                    "您所查詢的資料超過200筆, 系統僅會顯示前200筆資料, 若找不到您所需的資料, 請再縮小查詢範圍後重新查詢"
+                                )
+                            } else if (result.data.data.length == 0) {
+                                alert('查無此條件之資料，請再確認查詢條件')
+                            }
+                            console.log(result.data);
+                            
+
+                            $scope.DTfunction(result.data, qryData)
+
+                        }
+                    })
+                }
+
+              
+
+              
+
+
+
+                //往左補0
+                $scope.paddingLeft_HTML = function (key, len) {
+                    if ($scope.search[key] != null && $scope.search[key] != '') {
+                        if ($scope.search[key].length < len && $scope.search[key] != '') {
+                            $scope.search[key] = "0" + $scope.search[key]
+                            $scope.paddingLeft_HTML(key, len)
+                        }
+                    }
+                }
+
+                //lov
+                $scope.lov_click = function (code_type, code_seq, code_desc) {
+                    LOVwithBldcode(code_type, [code_seq, code_desc + ':text'], ["code_seq1"],
+                        ["code_desc1"], null, "search");
+                };
+
+                //字軌用lov
+                $scope.lov_click_Where = function (code_type, code_seq, code_desc) {
+                    var where = {
+                        "code_seq2": $scope.search.license_kind
+                    }
+                    if ($scope.search.license_kind == undefined) {
+                        alert("請先選擇執照類型");
+                    } else if ($scope.search.license_yy == undefined) {
+                        alert("請先輸入執照年度");
+                    } else if ($scope.search.license_no1 == undefined) {
+                        alert("請先輸入執照號碼");
+                    } else {
+                        LOVwithBldcode(code_type, [code_seq, code_desc + ':text'], ["code_seq1"],
+                            ["code_desc1"], where, "search");
+                    }
+
+                };
+
+                //拼出完整字軌
+                $scope.comLicense_desc = function () {
+                    var license_desc = '(' + $scope.search.license_yy.slice(0, 3) + ')' + '(' + $scope.search.license_yy.slice(3, 5) + ')' + '(' + $scope.search.license_yy.slice(5, 7) + ')' +
+                        $('#license_desc').val() + '字第'
+                    if ($scope.search.license_no1 != undefined) {
+                        license_desc += $scope.search.license_no1 + '號'
+                    }
+
+                    $scope.search.license_desc = license_desc
+                }
+
+                 //bm_p_list
+                 $scope.Edit2 = function (num) {
+                    var index = num;
+                    var data = $scope.grid_data2[index]
+                    if (data.person_seq == null || data.person_seq == "") {
+                        data.person_seq = '1'
+                    }
+
+                    $("#editdata").val(JSON.stringify(data))
+                    editform.submit()
+
+
+
+                }
+
+
+
+                $scope.DTfunction = function (getData, req) {
+
+                    $('#datatable').DataTable({
+                        "paging": true,
+                        "destroy": true,
+                        "select": true,
+                        "lengthMenu": [5, 10, 20],
+                        "data": getData,
+                        "ajax": {
+                            url: '/bmis/initBs36Search',
+                            type: "POST",
+                            data: req,
+
+                        },
+                        "columns": [
+                            { "data": "no" },
+                            { "data": "p03_name" },
+                            { "data": "reg_yy" },
+                            { "data": "license_desc" },
+                            { "data": "p03s_length" }
+
+                        ],
+                        "language": {
+                            "processing": "處理中...",
+                            "loadingRecords": "載入中...",
+                            "lengthMenu": "顯示 _MENU_ 項結果",
+                            "zeroRecords": "沒有符合的結果",
+                            "info": "",
+                            "infoEmpty": "顯示第 0 至 0 項結果，共 0 項",
+                            "infoFiltered": "(從 _MAX_ 項結果中過濾)",
+                            "infoPostFix": "",
+                            "search": "搜尋:",
+                            "paginate": {
+                                "first": "第一頁",
+                                "previous": "上一頁",
+                                "next": "下一頁",
+                                "last": "最後一頁"
+                            },
+                            "aria": {
+                                "sortAscending": ": 升冪排列",
+
+                            }
+                        }
+                    })
+
+
+
+                }
+             
+                $('#datatable').on('click', 'tr', function () {
+                    var data = $('#datatable').DataTable().row(this).data();
+                    console.log(data);
+
+                    if (data != undefined) {
+                        var qryData = {};
+                        var tableinfo = {};
+                        tableinfo.tablename = 'bm_p03_I20';
+                        tableinfo.order = [['person_seq', 'asc']];
+                        qryData.datainfo = { index_key: data.index_key }
+                        qryData.tableinfo = tableinfo
+                        var url = "/bmis/FreeQuery";
+                        $http.post(url, qryData).then(function success(result) {
+
+                            if (result.msg != undefined) {
+                                alert(result.msg)
+                            } else {
+
+                                if (result.data.data.length > 1) {
+
+                                    $('#bm_p_list').show();
+                                    $scope.grid_data2 = result.data.data;
+                                } else {
+                                    $("#editdata").val(JSON.stringify(data))
+
+                                    $('#myModal').modal('show')
+                                    $scope.data = data
+                                }
+
+                            }
+
+                        })
+
+                    }
+                })
+                  //新增
+                $scope.NewIN = function () {
+                   
+                    var editchk = confirm("是否要送出新增變更")
+                    if (!editchk) return false
+
+                    for (var key in $scope.data) {
+                        if ($scope.data[key] == '') {
+                            $scope.data[key] = null
+                        }
+                    }
+
+                    var qryData = {}
+                    qryData.update_where = {}
+                    qryData.update_where.guid = $scope.data.guid
+                    qryData.tableinfo = {};
+
+                    var datainfo = {};
+                    datainfo = $scope.data;
+                    datainfo.license_cg = "0" + String(parseInt($scope.data.p03s_length) + 1);
+                    qryData.datainfo = datainfo
+
+                    qryData.tableinfo.tablename = 'bm_p03s';
+
+                    //修改DB
+                    var url = "/bmis/Findorcreate";
+                    $http.post(url, qryData).then(function success(result) {
+
+                        if (result.data.msg != undefined) {
+                            alert(result.data.msg)
+                        } else {
+                            var url2 = "/bmis/initBs36ChangeSession";
+                            $http.post(url2, $scope.data).then(function success(result2) {
+                                alert('新增完成')
+                                window.location.reload()
+                            })
+                        }
+                    })
+                }
+
+
+
+
+
+
+
+
+            });
+
+            app.filter('range', function () {
+                return function (input, min, max) {
+                    min = parseInt(min);
+                    max = parseInt(max);
+                    for (var i = min; i < max; i++)
+                        input.push(i);
+                    return input;
+                };
+            });
+
+            app.directive('jqdatepicker', function () {
+                return {
+                    restrict: 'A',
+                    require: 'ngModel',
+                    link: function (scope, element, attrs, ngModelCtrl) {
+                        element.datepicker({
+                            onSelect: function (date) {
+                                scope.$apply(function () {
+                                    var rtn = paddingLeft(date.toString(), 7)
+                                    ngModelCtrl.$setViewValue(rtn);
+                                })
+                            }
+                        });
+                    }
+                };
+            });
+
+
+        </script>
